@@ -3,7 +3,7 @@
 * NEQ: !
 * ADJ: +
 
-Files will be indented with ** 2 spaces **.
+Files will be indented with **2 spaces**.
 
 ###Generate:
 **Input:** a csv file of 5 card hands: each card has a suit and a rank, and each hand has a class.
