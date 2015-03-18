@@ -31,9 +31,9 @@ Generates rules based on adjacency, rank equivalence, and suits for each hand.
 * Consider: how… exactly... are you going to tell it to not do 100% coverage for class 0. Stop, at some point?
 
 ### Evaluate:
-**Input:** a test file with unclassified hands and general classification rules for each hand (output of generate).
+**Input:** a [test file](https://raw.githubusercontent.com/jerath/pokerhands/master/test.csv) with unclassified hands and general classification rules for each hand (output of generate).
 
-**Output:** a csv file with the ids and hands of newly classified tuples. Should look like the [sample submission](https://github.com/jerath/pokerhands/blob/master/sampleSubmission.csv).
+**Output:** a csv file with the ids and hands of newly classified tuples. Should look like the [sample submission](https://raw.githubusercontent.com/jerath/pokerhands/master/sampleSubmission.csv).
 
 **Objective:**
 * Use the general rules to evaluate new tuples.
