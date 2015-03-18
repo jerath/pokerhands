@@ -10,10 +10,10 @@ Files will be indented with **2 spaces**.
 
 Example: header and first three rows of train.csv
 ```
-id,S1,C1,S2,C2,S3,C3,S4,C4,S5,C5
-1,1,10,2,2,3,3,3,8,1,1
-2,2,13,3,5,3,7,4,6,1,4
-3,1,3,1,11,2,8,2,1,2,4
+S1,C1,S2,C2,S3,C3,S4,C4,S5,C5,hand
+4,9,2,1,2,2,4,7,2,8,0
+1,4,3,6,1,12,3,11,2,7,0
+1,11,4,1,3,7,4,11,2,1,2
 ```
 **Output:** a data structure containing the rules and classification for each hand.
 
