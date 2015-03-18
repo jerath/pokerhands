@@ -1,44 +1,42 @@
-Conventions:
-EQU: = 
-NEQ: !
-ADJ: +
+####Conventions:
+* EQU: = 
+* NEQ: !
+* ADJ: +
 
-***Ignore data types used in examples. 
+Files will be indented with ** 2 spaces **.
 
-***Need some metric for suits
+###Generate:
+**Input:** a csv file of 5 card hands: each card has a suit and a rank, and each hand has a class.
 
-GENERATE RULES:
-Input: a csv file with a header row https://www.kaggle.com/c/poker-rule-induction/data
-Output: TBD by generalize rules. A file with stuff. Depends on properties of csv file.
+Example: header and first three rows of train.csv
+```
+id,S1,C1,S2,C2,S3,C3,S4,C4,S5,C5
+1,1,10,2,2,3,3,3,8,1,1
+2,2,13,3,5,3,7,4,6,1,4
+3,1,3,1,11,2,8,2,1,2,4
+```
+**Output:** a data structure containing the rules and classification for each hand.
 
-Objective:
-Read input from a file
-Sorting the data based on different classes (perhaps a new file)
-Counting the number of each class (to compute coverage later)
-Generate all the (long form) rules that we will be using: =, !, +, suits (discuss with rule generalizer). 
-Refine based on transitive equality and linear relationships
-Ex. 1 1 1 2 3 -> (R1 = R2), (R1 = R3), (R3 + R4), (R4 + R5)
-Note: Might be easier to generate = first, and then !. Entirely up to you.
-Your end product is the minimum list of rules that exactly describes that hand.
-Your output has the rules and the sorted classes.
-Ex. [(R1 = R2), (R1 = R3), (R3 + R4), (R4 + R5)], class = 3 of a kind.
+**Objective:**
+Generates rules based on adjacency, rank equivalence, and suits for each hand.
 
-GENERALIZE RULES:
-Input: <output from generating rules> YOU GET TO DECIDE WHAT IT LOOKS LIKE
-Output: discuss with class evaluator
+###Generalize:
+**Input:** a data structure containing the rules and classification for each hand (the output from generate).
 
-Objective:
-Take each class one at a time and calculate coverage of rules.
-Consider the count of =, !, +, suits (discuss with rule generator).
-Consider: how… exactly... are you going to tell it to not do 100% coverage for class 0. Stop, at some point?
+**Output:** a data structure containing general rules for each classification of hand (0-9)?
 
-EVALUATE:
-Input: some combination of tuples and dictionaries, maybe? discuss with rule generalizer, and a file of new tuples
-Output: the evaluated class
+**Objective:**
+* Take each class one at a time and calculate coverage of rules.
+* Consider the count of =, !, +, suits.
+* Consider: how… exactly... are you going to tell it to not do 100% coverage for class 0. Stop, at some point?
 
-Objective:
-Take new tuples and evaluate them based on the rules.
-Must be able to compute new rules 
-Find the closest rule.
+### Evaluate:
+**Input:** a test file with unclassified hands and general classification rules for each hand (output of generate).
+
+**Output:** a csv file with the ids and hands of newly classified tuples. Should look like the [sample submission](https://github.com/jerath/pokerhands/blob/master/sampleSubmission.csv).
+
+**Objective:**
+* Use the general rules to evaluate new tuples.
+* Find the closest rule.
 
 
