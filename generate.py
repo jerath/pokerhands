@@ -3,7 +3,7 @@ import csv
 import fnmatch
 
 """
-Dictionarys created by csc.DictReader for training file have the following format:
+Dictionarys created by csv.DictReader for training file have the following format:
 {'S3': '2', 'S2': '4', 'S1': '4', 'S5': '4', 'S4': '1', 'C3': '7', 'C2': '9', 'C1': '8', 'hand': '4', 'C5': '11', 'C4': '10'}
 So Keys are: S1, S2, S3, S4, S5, C1, C2, C3, C4, C5 and hand (which is our class value)
 """
@@ -60,7 +60,7 @@ def adjacent( training_dict, hand_size ):
     return adj_set
 
 """
-Takes a dictionary reader (reading from a csv file.
+Takes a dictionary reader (reading from a csv file).
 Generates rules based on simple assumptions for every hand, and adds them to a dictionary of hand rules.
 
 """
