@@ -34,13 +34,28 @@ def main():
 
   # how can the rules be collapsed.
   # the key is the hand
+  general_rules = {}
+
+
   for key in rules:
     if key is '1':
-      # rules[key] is the list of all rules associated with that hand
-      for rule_set in rules[key]:
-        
-        print rule_set
 
+      # count num equals in hand.
+      # count num neq in hand.
+      # count num adj in hand.
+
+      general_rules[key]['equiv'] = 0
+      general_rules[key]['adj'] = 0
+      # rules[key] is the list of all rules associated with that hand
+      # for every rule, identify if middle is = or + and add to count of that rule
+      for hand in rules[key]:
+        for obs in hand:
+          if obs[1] is '=':
+            general_rules[key]['equiv'] += 1
+          elif obs[1] is '+':
+            general_rules[key]['adj'] += 1
+        print "+++++++++++++"
+      print general_rules
   # rules_file = sys.argv[1]
   # rules_csv = open( rules_file )
   # rules_reader = csv.DictReader(rules_csv) #Creates a dict from rows in rules_csv, using first row as keys

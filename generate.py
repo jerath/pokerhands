@@ -81,6 +81,10 @@ def adjacent_card( training_dict, hand_size ):
                 #print ('Theres something here...')
                 adj_set += [(card, '+', next_card)]
                 num_adj += 1
+            elif((training_dict['C'+str(card)]%12) == (training_dict['C'+str(next_card)]%12)) and (training_dict['C'+str(card)] != training_dict['C'+str(next_card)]):
+                adj_set += [(card, '+', next_card)]
+                num_adj += 1
+
     adj_set += [('a',num_adj)]
 
     return adj_set
@@ -117,6 +121,25 @@ def generate( training_reader ):
         else:
             hands[str(line['hand'])].append(equ+same+adj+card)
 
+def generalize():
+    global hands
+    generalized_rules = {}
+
+    for key in hands:
+        # rules is the first hand in hands
+        rules = hands[key][0]
+        for hand in hands[key]:
+            new_rules = rules
+            for rule in rules:
+                if rule not in hand:
+                    new_rules.remove(rule)
+            rules = new_rules
+        generalized_rules[key] = rules
+
+    print generalized_rules
+
+
+
 #WHEN RUNNING: First arg is training file.
 def main():
     global hands
@@ -127,7 +150,9 @@ def main():
 
     generate( training_reader )
 
-    print (hands)
+    # print (hands)
+    generalize()
+
 
 if __name__ == "__main__":
     main()
