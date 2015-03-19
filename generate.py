@@ -38,6 +38,27 @@ def equal_card( training_dict, hand_size ):
 
     return same_set
 
+def equal_suit( training_dict, hand_size ):
+    same_suit = []
+    num_equ = 0
+
+    #For each card in the hand
+    for card in range(1,hand_size):
+        #Look at the rest of the cards in the hand
+        for next_card in range(card+1,hand_size+1):
+            #print (card, next_card)
+
+            #If the current card is the same as the next card, add them to the list
+            if training_dict['S'+str(card)] == training_dict['S'+str(next_card)]:
+                same_suit += [(card, '#', next_card)]
+                num_equ += 1
+            else:
+            	same_suit += [(card, '%', next_card)]
+            	
+    same_suit += [('s', num_equ)]
+
+    return same_suit
+
 """
 Takes a dictionary describing a hand, and the size of the hand.
 Generates a list of card values that are adjacent.
@@ -84,16 +105,17 @@ def generate( training_reader ):
             if fnmatch.fnmatch( key, 'C?'):
                 num_cards += 1
 
-        same = equal_card( line, num_cards )
+        equ = equal_card( line, num_cards )
+        same = equal_suit( line, num_cards )
         adj = adjacent_card( line, num_cards )
 
         #line['rules'] = same + adj #Not used
 
         #Add rules to respective hand classifications
         if str(line['hand']) not in hands.keys():
-            hands[str(line['hand'])] = [same+adj+card]
+            hands[str(line['hand'])] = [equ+same+adj+card]
         else:
-            hands[str(line['hand'])].append(same+adj+card)
+            hands[str(line['hand'])].append(equ+same+adj+card)
 
 #WHEN RUNNING: First arg is training file.
 def main():
