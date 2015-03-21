@@ -10,7 +10,7 @@ Files will be indented with **4 spaces**.
 See contest details [here](https://www.kaggle.com/c/poker-rule-induction).
 
 ###Generate:
-**Input:** a csv file of 5 card hands: each card has a suit and a rank, and each hand has a class.
+**Input:** a [training file](https://raw.githubusercontent.com/jerath/pokerhands/master/train.csv) of 5 card hands: each card has a suit and a rank, and each hand has a class.
 
 Example: header and first three rows of train.csv
 ```
