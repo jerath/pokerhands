@@ -1,9 +1,11 @@
 ####Conventions:
-* EQU: = 
-* NEQ: !
-* ADJ: +
+* CARDEQU: = 
+* CARDNEQ: !
+* CARDADJ: +
+* SUITEQU: #
+* SUITNEQ: %
 
-Files will be indented with **2 spaces**.
+Files will be indented with **4 spaces**.
 
 See contest details [here](https://www.kaggle.com/c/poker-rule-induction).
 
