@@ -8,8 +8,6 @@ Dictionarys created by csv.DictReader for training file have the following forma
 So Keys are: S1, S2, S3, S4, S5, C1, C2, C3, C4, C5 and hand (which is our class value)
 """
 
-hands = {} #Dict of hand types, with list of rules for each hand of that type
-
 """
 Takes a dictionary describing a hand, and the size of the hand.
 Generates a list of card values that are the same.
@@ -94,7 +92,8 @@ Takes a dictionary reader (reading from a csv file).
 Generates rules based on simple assumptions for every hand, and adds them to a dictionary of hand rules.
 """
 def generate( training_reader ):
-    global hands
+
+    hands = {}
 
     for line in training_reader:
         num_cards = 0
@@ -103,7 +102,10 @@ def generate( training_reader ):
         #Turn all the values in line into integers
         for key in line:
             line[key] = int(line[key])
-            card += [(key, line[key])]
+            
+            # get rid of the hand key
+            if key != 'hand':
+                card += [(key, line[key])]
 
             #Count number of cards in hand
             if fnmatch.fnmatch( key, 'C?'):
@@ -120,9 +122,10 @@ def generate( training_reader ):
             hands[str(line['hand'])] = [equ+same+adj+card]
         else:
             hands[str(line['hand'])].append(equ+same+adj+card)
+    return hands 
 
-def generalize():
-    global hands
+def generalize( hands ):
+
     generalized_rules = {}
 
     for key in hands:
@@ -136,15 +139,17 @@ def generalize():
             rules = new_rules
         generalized_rules[key] = rules
 
-    print generalized_rules
+    return generalized_rules
 
 def generate_test_training(training_list, mod_num):
     # use mod to split this list into a list of tests and 
 
     test_list = []
     train_list = []
+
+    # every ith line goes to a test list, the rest to a training set
     for index in range(len(training_list)):
-        if index % 10 == mod_num:
+        if index %80 == mod_num:
             test_list.append(training_list[index])
         else:
             train_list.append(training_list[index])
@@ -152,11 +157,98 @@ def generate_test_training(training_list, mod_num):
     return test_list, train_list
     # training dictionaries go to generate and generalize
 
+def classify( test_list, rules ):
+    # test_list is a list of hand dicts
+    # rules is a rules dictionary with key = hand class, value = list of rules
+    count = 0
+    classified = []
+    # generate a rule for each thing in test list
+    for hand in test_list:
+        num_cards = 0
+        card = []
+        count += 1
+
+        #Turn all the values in line into integers
+        for key in hand:
+            hand[key] = int(hand[key])
+            
+            # get rid of the hand key
+            if key != 'hand':
+                card += [(key, hand[key])]
+
+            #Count number of cards in hand
+            if fnmatch.fnmatch( key, 'C?'):
+                num_cards += 1
+
+        equ = equal_card( hand, num_cards )
+        same = equal_suit( hand, num_cards )
+        adj = adjacent_card( hand, num_cards )
+
+        hand_rules = equ + same + adj + card
+
+        # for the rules for each hand
+        # rule is key
+
+        classification = '-1'
+
+        for key in rules:
+
+            new_rules = []
+            for rule in rules[key]:
+                if rule in hand_rules:
+                    new_rules += [rule]
+
+            #print 'hand ', hand_rules
+            #print 'new ',new_rules
+            #print 'old ',rules[key]
+
+            if new_rules == rules[key]:
+                #print 'WE MADE IT'
+                if classification == '-1':
+                    classification = key
+                else:
+                    if len(rules[key]) > len(rules[classification]):
+                        classification = key
+
+            # go through the list of rules for a hand
+        
+        classified += [{ 'id':count, 'class':classification}]
+
+            # take the intersect.
+            # if the intersect == the rule that we came up with for the hand class
+            # then this is the rule.
+
+
+    return classified
+    # classify the hand based on the rules
+
+    # for each rule in rules, take the intersection of the rules of the test hand and the rule.
+
+    # the one it matches that has the most rules is the hand we choose..
+    # add unclassified component? 
+
+    # evaluate?
+
+def evaluate( classification, test_list):
+    num_right = 0
+    num_wrong = 0
+
+    for i in range(0,len(test_list)):
+
+
+        #print 'test ', test_list[i]['hand'], ' class ', classification[i]['class']
+
+        if int(test_list[i]['hand']) == int(classification[i]['class']):
+            num_right += 1
+        else:
+            num_wrong += 1
+            print test_list[i]
+
+    return num_right, num_wrong
 
 
 #WHEN RUNNING: First arg is training file.
 def main():
-    global hands
 
     training_file = sys.argv[1]
     training_csv = open( training_file )
@@ -166,17 +258,24 @@ def main():
     for line in training_reader:
         training_list.append(line)
 
-    for i in range(0,10):
+    # divide training file into 10 parts
+    for i in range(0,80):
         test_list, train_list = generate_test_training(training_list, i)
-
-        generate( train_list )
+        
+        hands = generate( train_list )
 
         # print (hands)
-        generalize()
+        rules = generalize( hands )
 
         # evaluate test data
-
+        #print ' ++++++++++++++++++++ ', i , ' ++++++++++++++ '
+        #print rules 
         # compare evaluation to actual hand
+
+        classification = classify(test_list, rules)
+        right, wrong = evaluate(classification, test_list)
+
+        print 'Right = ', right, ' Wrong = ', wrong
 
 if __name__ == "__main__":
     main()
