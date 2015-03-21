@@ -138,6 +138,20 @@ def generalize():
 
     print generalized_rules
 
+def generate_test_training(training_list, mod_num):
+    # use mod to split this list into a list of tests and 
+
+    test_list = []
+    train_list = []
+    for index in range(len(training_list)):
+        if index % 10 == mod_num:
+            test_list.append(training_list[index])
+        else:
+            train_list.append(training_list[index])
+
+    return test_list, train_list
+    # training dictionaries go to generate and generalize
+
 
 
 #WHEN RUNNING: First arg is training file.
@@ -148,11 +162,21 @@ def main():
     training_csv = open( training_file )
     training_reader = csv.DictReader(training_csv) #Creates a dict from rows in csvfile, using first row as keys
 
-    generate( training_reader )
+    training_list = []
+    for line in training_reader:
+        training_list.append(line)
 
-    # print (hands)
-    generalize()
+    for i in range(0,10):
+        test_list, train_list = generate_test_training(training_list, i)
 
+        generate( train_list )
+
+        # print (hands)
+        generalize()
+
+        # evaluate test data
+
+        # compare evaluation to actual hand
 
 if __name__ == "__main__":
     main()
