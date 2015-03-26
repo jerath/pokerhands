@@ -36,6 +36,27 @@ def equal_card( training_dict, hand_size ):
 
     return same_set
 
+def maxmin_card( training_dict, hand_size ):
+    cur_max = -1
+    cur_min = -1
+    num_avg = 0
+    
+    for card in range(1,hand_size+1):
+        if cur_max == -1:
+            cur_max = training_dict['C'+str(card)]
+        if cur_min == -1:
+            cur_min = training_dict['C'+str(card)]
+        if training_dict['C'+str(card)] > cur_max:
+            cur_max = training_dict['C'+str(card)]
+        if training_dict['C'+str(card)] < cur_min:
+            cur_min = training_dict['C'+str(card)]
+
+        num_avg += training_dict['C'+str(card)]
+
+    num_avg = num_avg / hand_size
+
+    return [('n', cur_min),('m', cur_max), ('v', num_avg)]
+
 def equal_suit( training_dict, hand_size ):
     same_suit = []
     num_equ = 0
@@ -75,7 +96,7 @@ def adjacent_card( training_dict, hand_size ):
             #print (card, next_card)
 
             #If the current card is one greater or one less than the next card, add them to the list
-            if (training_dict['C'+str(card)] == training_dict['C'+str(next_card)]+1) or (training_dict['C'+str(card)] == training_dict['C'+str(next_card)]-1):
+            if (training_dict['C'+str(card)] == (training_dict['C'+str(next_card)]+1)) or (training_dict['C'+str(card)] == (training_dict['C'+str(next_card)]-1)):
                 #print ('Theres something here...')
                 adj_set += [(card, '+', next_card)]
                 num_adj += 1
@@ -112,6 +133,7 @@ def generate( training_reader ):
                 num_cards += 1
 
         equ = equal_card( line, num_cards )
+        maxmin_num = maxmin_card( line, num_cards )
         same = equal_suit( line, num_cards )
         adj = adjacent_card( line, num_cards )
 
@@ -119,9 +141,9 @@ def generate( training_reader ):
 
         #Add rules to respective hand classifications
         if str(line['hand']) not in hands.keys():
-            hands[str(line['hand'])] = [equ+same+adj+card]
+            hands[str(line['hand'])] = [equ+maxmin_num+same+adj+card]
         else:
-            hands[str(line['hand'])].append(equ+same+adj+card)
+            hands[str(line['hand'])].append(equ+maxmin_num+same+adj+card)
     return hands 
 
 def generalize( hands ):
@@ -129,33 +151,25 @@ def generalize( hands ):
     generalized_rules = {}
 
     for key in hands:
+        print ('Hand : ' + key + ' Number: ' + str(len(hands[key])))
         # rules is the first hand in hands
         rules = hands[key][0]
+        #print ('BASE HAND: ' +  str(hands[key][0]))
         for hand in hands[key]:
-            new_rules = rules
+            #print ('TEST HAND: ' + str(hand))
+            #print ('RULE HAND: ' + str(rules))
+            
+            new_rules = list(rules)
             for rule in rules:
+                #print ('Looking at: ' + str(rule) )
                 if rule not in hand:
                     new_rules.remove(rule)
-            rules = new_rules
+
+            rules = list(new_rules)
+
         generalized_rules[key] = rules
 
     return generalized_rules
-
-def generate_test_training(training_list, mod_num):
-    # use mod to split this list into a list of tests and 
-
-    test_list = []
-    train_list = []
-
-    # every ith line goes to a test list, the rest to a training set
-    for index in range(len(training_list)):
-        if index %80 == mod_num:
-            test_list.append(training_list[index])
-        else:
-            train_list.append(training_list[index])
-
-    return test_list, train_list
-    # training dictionaries go to generate and generalize
 
 def classify( test_list, rules ):
     # test_list is a list of hand dicts
@@ -181,10 +195,11 @@ def classify( test_list, rules ):
                 num_cards += 1
 
         equ = equal_card( hand, num_cards )
+        maxmin_num = maxmin_card( hand, num_cards )
         same = equal_suit( hand, num_cards )
         adj = adjacent_card( hand, num_cards )
 
-        hand_rules = equ + same + adj + card
+        hand_rules = equ + maxmin_num + same + adj + card
 
         # for the rules for each hand
         # rule is key
@@ -232,20 +247,91 @@ def classify( test_list, rules ):
 def evaluate( classification, test_list):
     num_right = 0
     num_wrong = 0
+    
+    c0 = c1 = c2 = c3 = c4 = c5 = c6 = c7 = c8 = c9 = 0
+    s0 = s1 = s2 = s3 = s4 = s5 = s6 = s7 = s8 = s9 = 0
 
     for i in range(0,len(test_list)):
+
+        if int(test_list[i]['hand']) == 0:
+            s0 += 1
+        if int(test_list[i]['hand']) == 1:
+            s1 += 1
+        if int(test_list[i]['hand']) == 2:
+            s2 += 1
+        if int(test_list[i]['hand']) == 3:
+            s3 += 1
+        if int(test_list[i]['hand']) == 4:
+            s4 += 1
+        if int(test_list[i]['hand']) == 5:
+            s5 += 1
+        if int(test_list[i]['hand']) == 6:
+            s6 += 1
+        if int(test_list[i]['hand']) == 7:
+            s7 += 1
+        if int(test_list[i]['hand']) == 8:
+            s8 += 1
+        if int(test_list[i]['hand']) == 9:
+            s9 += 1
 
 
         #print 'test ', test_list[i]['hand'], ' class ', classification[i]['class']
 
         if int(test_list[i]['hand']) == int(classification[i]['class']):
+            if int(test_list[i]['hand']) == 0:
+                c0 += 1
+            if int(test_list[i]['hand']) == 1:
+                c1 += 1
+            if int(test_list[i]['hand']) == 2:
+                c2 += 1
+            if int(test_list[i]['hand']) == 3:
+                c3 += 1
+            if int(test_list[i]['hand']) == 4:
+                c4 += 1
+            if int(test_list[i]['hand']) == 5:
+                c5 += 1
+            if int(test_list[i]['hand']) == 6:
+                c6 += 1
+            if int(test_list[i]['hand']) == 7:
+                c7 += 1
+            if int(test_list[i]['hand']) == 8:
+                c8 += 1
+            if int(test_list[i]['hand']) == 9:
+                c9 += 1
             num_right += 1
         else:
             num_wrong += 1
-            print test_list[i]
+            #print (test_list[i])
+            #print ('Expect: ' + str(test_list[i]['hand']) + ' Produced: ' + str(classification[i]['class']))
+
+    print ('0: Right: ' + str(c0) + ' out of: ' + str(s0))
+    print ('1: Right: ' + str(c1) + ' out of: ' + str(s1))
+    print ('2: Right: ' + str(c2) + ' out of: ' + str(s2))
+    print ('3: Right: ' + str(c3) + ' out of: ' + str(s3))
+    print ('4: Right: ' + str(c4) + ' out of: ' + str(s4))
+    print ('5: Right: ' + str(c5) + ' out of: ' + str(s5))
+    print ('6: Right: ' + str(c6) + ' out of: ' + str(s6))
+    print ('7: Right: ' + str(c7) + ' out of: ' + str(s7))
+    print ('8: Right: ' + str(c8) + ' out of: ' + str(s8))
+    print ('9: Right: ' + str(c9) + ' out of: ' + str(s9))
 
     return num_right, num_wrong
 
+def generate_test_training(training_list, mod_num):
+    # use mod to split this list into a list of tests and 
+
+    test_list = []
+    train_list = []
+
+    # every ith line goes to a test list, the rest to a training set
+    for index in range(len(training_list)):
+        if index %10 == mod_num:
+            test_list.append(training_list[index])
+        else:
+            train_list.append(training_list[index])
+
+    return test_list, train_list
+    # training dictionaries go to generate and generalize
 
 #WHEN RUNNING: First arg is training file.
 def main():
@@ -259,7 +345,7 @@ def main():
         training_list.append(line)
 
     # divide training file into 10 parts
-    for i in range(0,80):
+    for i in range(0,10):
         test_list, train_list = generate_test_training(training_list, i)
         
         hands = generate( train_list )
@@ -268,14 +354,14 @@ def main():
         rules = generalize( hands )
 
         # evaluate test data
-        #print ' ++++++++++++++++++++ ', i , ' ++++++++++++++ '
-        #print rules 
+        #print (' ++++++++++++++++++++ ', i , ' ++++++++++++++ ')
+        #print (rules) 
         # compare evaluation to actual hand
 
         classification = classify(test_list, rules)
         right, wrong = evaluate(classification, test_list)
 
-        print 'Right = ', right, ' Wrong = ', wrong
+        print ('Right = ', right, ' Wrong = ', wrong)
 
 if __name__ == "__main__":
     main()
