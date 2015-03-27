@@ -10,10 +10,12 @@ So Keys are: S1, S2, S3, S4, S5, C1, C2, C3, C4, C5 and hand (which is our class
 
 """
 Takes a dictionary describing a hand, and the size of the hand.
-Generates a list of card values that are the same.
+Generates a list of card values that are the same and different.
 Eg. Given: {'S3': '2', 'S2': '4', 'S1': '4', 'S5': '4', 'S4': '1', 'C3': '7', 'C2': '9', 'C1': '8', 'hand': '4', 'C5': '9', 'C4': '10'}
 Will return: [(2, '=', 5)] 
-This indicates card 2 is the same as card 5.
+'=' = same value
+'!' = different value
+'e' = number of equal cards (includes duplicate counting)
 """
 def equal_card( training_dict, hand_size ):
     same_set = []
@@ -36,6 +38,15 @@ def equal_card( training_dict, hand_size ):
 
     return same_set
 
+"""
+Takes a dictionary describing a hand, and the size of the hand.
+Generates a list containing the max, min, and avg card values. Assumes cards can not have a negative value.
+Eg. Given: {'S3': '2', 'S2': '4', 'S1': '4', 'S5': '4', 'S4': '1', 'C3': '7', 'C2': '9', 'C1': '8', 'hand': '4', 'C5': '9', 'C4': '10'}
+Will return: [('m', 10), ('n', 7), ('v', 8.6)] 
+'m' = max
+'n' = min
+'v' = average
+"""
 def maxmin_card( training_dict, hand_size ):
     cur_max = -1
     cur_min = -1
@@ -57,6 +68,15 @@ def maxmin_card( training_dict, hand_size ):
 
     return [('n', cur_min),('m', cur_max), ('v', num_avg)]
 
+"""
+Takes a dictionary describing a hand, and the size of the hand.
+Generates a list of card suits that are the same and those that are differnent.
+Eg. Given: {'S3': '2', 'S2': '4', 'S1': '4', 'S5': '4', 'S4': '1', 'C3': '7', 'C2': '9', 'C1': '8', 'hand': '4', 'C5': '9', 'C4': '10'}
+Will return: [(2, '=', 5)] 
+'#' = same suit
+'%' = different suit
+'s' = number of same suit (includes duplicate counting)
+"""
 def equal_suit( training_dict, hand_size ):
     same_suit = []
     num_equ = 0
@@ -83,7 +103,8 @@ Takes a dictionary describing a hand, and the size of the hand.
 Generates a list of card values that are adjacent.
 Eg. Given: {'S3': '2', 'S2': '4', 'S1': '4', 'S5': '4', 'S4': '1', 'C3': '7', 'C2': '9', 'C1': '8', 'hand': '4', 'C5': '9', 'C4': '10'}
 Will return: [(1, '+', 2), (1, '+', 3), (1, '+', 5) (2, '+', 4), (4, '+', 5)] 
-This indicates card 1 is adjacent to 2, 1 is adjacent to 3, 1 is adjacent to 5, 2 is adjacent to 4, and 4 is adjacent to 5
+'+' = Adjacent ( +/- 1 from each other)
+'a' = Number adjacent
 """
 def adjacent_card( training_dict, hand_size ):
     adj_set = []
@@ -109,7 +130,7 @@ def adjacent_card( training_dict, hand_size ):
     return adj_set
 
 """
-Takes a dictionary reader (reading from a csv file).
+Takes a list of dictionaries from training file.
 Generates rules based on simple assumptions for every hand, and adds them to a dictionary of hand rules.
 """
 def generate( training_reader ):
@@ -132,10 +153,10 @@ def generate( training_reader ):
             if fnmatch.fnmatch( key, 'C?'):
                 num_cards += 1
 
-        equ = equal_card( line, num_cards )
-        maxmin_num = maxmin_card( line, num_cards )
-        same = equal_suit( line, num_cards )
-        adj = adjacent_card( line, num_cards )
+        equ = equal_card( line, num_cards ) #Same and different values
+        maxmin_num = maxmin_card( line, num_cards ) #Max, min and avg
+        same = equal_suit( line, num_cards ) #Same and differnt suits
+        adj = adjacent_card( line, num_cards ) #Adjacent cards
 
         #line['rules'] = same + adj #Not used
 
@@ -146,6 +167,11 @@ def generate( training_reader ):
             hands[str(line['hand'])].append(equ+maxmin_num+same+adj+card)
     return hands 
 
+"""
+Takes a dictionary of hand classes, which refer to lists of rules for indevidual hands.
+For each class, for each hand in that class, compairs rule by rule and eliminates all rules that are not common to both.
+Produces a minimum list of rules required to identify a hand classification with 100% coverage.
+"""
 def generalize( hands ):
 
     generalized_rules = {}
@@ -171,6 +197,22 @@ def generalize( hands ):
 
     return generalized_rules
 
+"""
+Takes a list of hands to be classified, and the rules generated in training.
+Generates rules for each hand to be classified and attempts to classify them using the rules.
+
+-1: Could not classify.
+0: Nothing in hand; not a recognized poker hand 
+1: One pair; one pair of equal ranks within five cards
+2: Two pairs; two pairs of equal ranks within five cards
+3: Three of a kind; three equal ranks within five cards
+4: Straight; five cards, sequentially ranked with no gaps
+5: Flush; five cards with the same suit
+6: Full house; pair + different rank three of a kind
+7: Four of a kind; four equal ranks within five cards
+8: Straight flush; straight + flush
+9: Royal flush; {Ace, King, Queen, Jack, Ten} + flush
+"""
 def classify( test_list, rules ):
     # test_list is a list of hand dicts
     # rules is a rules dictionary with key = hand class, value = list of rules
@@ -317,6 +359,11 @@ def evaluate( classification, test_list):
 
     return num_right, num_wrong
 
+"""
+Takes a list of dictinaries, corresponding to hands in the training file and a current mod_num (number to split on)
+Separates out 1/10th of the training data as classified testing data.
+Returns as list of training hands and a list of testing hands.
+"""
 def generate_test_training(training_list, mod_num):
     # use mod to split this list into a list of tests and 
 
