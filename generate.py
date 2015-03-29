@@ -354,17 +354,18 @@ def evaluate( classification, test_list):
     return num_right, num_wrong
 
 """
-Takes a list of dictinaries, corresponding to hands in the training file and a current mod_num (number to split on)
-Separates out 1/10th of the training data as classified testing data.
+Takes list of dictinaries corresponding to hands in the training file and a current mod_num (number to split on) 
+and k, the variable for k-fold cross-validation
+Separates out 1/kth of the training data as classified testing data.
 Returns as list of training hands and a list of testing hands.
 """
-def generate_test_training(training_list, mod_num):
+def generate_test_training(training_list, mod_num, k):
     test_list = []
     train_list = []
 
     # every mod_numth line goes to a test list, the rest to a training set
     for index in range(len(training_list)):
-        if index %10 == mod_num:
+        if index % k == mod_num:
             test_list.append(training_list[index])
         else:
             train_list.append(training_list[index])
@@ -383,9 +384,12 @@ def main():
     for line in training_reader:
         training_list.append(line)
 
+    # how many chunks to split training set into for k fold cross-validation
+    k = 20 
+
     # divide training list 10 different ways and perform classification on each fold
-    for i in range(0,10):
-        test_list, train_list = generate_test_training(training_list, i) #Separate training and testing
+    for i in range(0,k):
+        test_list, train_list = generate_test_training(training_list, i, k) #Separate training and testing
         hands = generate( train_list ) #Generate rules for each hand
         rules = generalize( hands ) #Generalize the rules into minimum sets
 
