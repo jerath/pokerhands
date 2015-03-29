@@ -372,18 +372,13 @@ def generate_test_training(training_list, mod_num, k):
 
     return test_list, train_list
 
-#WHEN RUNNING: First arg is training file.
-def main():
+"""
+Tests our classification accuracy using k-fold cross validation
+Input: list of dictionaries corresponding to hands in the training file
+Output: classification accuracy in terms of right/wrong for each chunk
+"""
 
-    training_file = sys.argv[1]
-    training_csv = open( training_file )
-    training_reader = csv.DictReader(training_csv) #Creates a dict from rows in csvfile, using first row as keys
-
-    #Add all training hands to a list
-    training_list = []
-    for line in training_reader:
-        training_list.append(line)
-
+def run_k_fold_test(training_list):
     # how many chunks to split training set into for k fold cross-validation
     k = 10
 
@@ -397,6 +392,25 @@ def main():
         right, wrong = evaluate(classification, test_list) #Evaluate correctness of classification of testing set
 
         print ('Right = ', right, ' Wrong = ', wrong)
+
+
+#WHEN RUNNING: First arg is training file.
+def main():
+
+    training_file = sys.argv[1]
+    training_csv = open( training_file )
+    training_reader = csv.DictReader(training_csv) #Creates a dict from rows in csvfile, using first row as keys
+
+    #Add all training hands to a list
+    training_list = []
+    for line in training_reader:
+        training_list.append(line)
+
+
+    # run_k_fold_test(training_list)
+
+
+
 
 if __name__ == "__main__":
     main()
