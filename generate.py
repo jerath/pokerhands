@@ -136,6 +136,8 @@ Generates rules based on simple assumptions for every hand, and adds them to a d
 Returns this dictionary of hand rules.
 """
 def generate( training_reader ):
+    print "I'm generating : )"
+
     hands = {}
 
     #For each hand in the training set
@@ -173,6 +175,7 @@ For each class, for each hand in that class, compairs rule by rule and eliminate
 Produces a minimum list of rules required to identify a hand classification with 100% coverage.
 """
 def generalize( hands ):
+    print "I'm generalizing! : )"
     generalized_rules = {}
 
     #For each classification option for hands
@@ -218,6 +221,9 @@ Returns a list of dictionaries where each has an 'id' corresponding to the order
 9: Royal flush; {Ace, King, Queen, Jack, Ten} + flush
 """
 def classify( test_list, rules ):
+
+    print "I'm classifying! : )"
+
     count = 0
     classified = []
     # generate a rule for each hand in test list
@@ -399,26 +405,41 @@ Input:
 Output: a file of our submission
 """
 def gen_competition_submission(training_list):
-
+    print "hi"
 
 #WHEN RUNNING: First arg is training file.
 def main():
 
     training_file = sys.argv[1]
+    test_file = sys.argv[2]
+    
     training_csv = open( training_file )
     training_reader = csv.DictReader(training_csv) #Creates a dict from rows in csvfile, using first row as keys
+
+    # creates a dict for the test file as well
+    test_csv = open( test_file )
+    test_reader = csv.DictReader( test_csv )
 
     #Add all training hands to a list
     training_list = []
     for line in training_reader:
         training_list.append(line)
 
+    # Add all testing hands to a list
+    test_list = []
+    for line in test_reader:
+        test_list.append(line)
 
-    for key in training_reader:
-        print key
+
     # run_k_fold_test(training_list)
 
-
+    # GENERATE RULES FOR TEST DATA SET: 
+    # use training data to generate saturated rule set
+    hands = generate( training_list )
+    # generalize saturated rule set
+    rules = generalize( hands )
+    # classify test_set using the general rules
+    classification = classify( test_list, rules )
 
 
 
