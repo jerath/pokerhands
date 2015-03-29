@@ -229,19 +229,18 @@ def classify( test_list, rules ):
         #Turn all the values in line into integers
         for key in hand:
             hand[key] = int(hand[key])
-
             # get rid of the hand key, and create a list of the cards and their values
             if key != 'hand':
-                card += [(key, line[key])]
+                card += [(key, hand[key])]
 
             #Count number of cards in hand
             if fnmatch.fnmatch( key, 'C?'):
                 num_cards += 1
 
-        equ = equal_card( line, num_cards ) #Same and different values
-        maxmin_num = maxmin_card( line, num_cards ) #Max, min and avg
-        same = equal_suit( line, num_cards ) #Same and differnt suits
-        adj = adjacent_card( line, num_cards ) #Adjacent cards
+        equ = equal_card( hand, num_cards ) #Same and different values
+        maxmin_num = maxmin_card( hand, num_cards ) #Max, min and avg
+        same = equal_suit( hand, num_cards ) #Same and differnt suits
+        adj = adjacent_card( hand, num_cards ) #Adjacent cards
 
         hand_rules = equ + maxmin_num + same + adj + card #Compiled list of rules for the hand
 
