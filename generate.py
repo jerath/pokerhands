@@ -393,6 +393,13 @@ def run_k_fold_test(training_list):
 
         print ('Right = ', right, ' Wrong = ', wrong)
 
+"""
+Classifies all tuples in the test set using our rules from the training data.
+Input:
+Output: a file of our submission
+"""
+def gen_competition_submission(training_list):
+
 
 #WHEN RUNNING: First arg is training file.
 def main():
@@ -407,7 +414,10 @@ def main():
         training_list.append(line)
 
 
+    for key in training_reader:
+        print key
     # run_k_fold_test(training_list)
+
 
 
 
