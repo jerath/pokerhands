@@ -57,3 +57,4 @@ Hand classification:
 9: Royal flush; {Ace, King, Queen, Jack, Ten} + flush
 ```
 
+[Playing card vector source](https://code.google.com/p/vectorized-playing-cards/)
