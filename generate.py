@@ -385,14 +385,14 @@ def main():
         training_list.append(line)
 
     # how many chunks to split training set into for k fold cross-validation
-    k = 20 
+    k = 10
 
     # divide training list 10 different ways and perform classification on each fold
     for i in range(0,k):
         test_list, train_list = generate_test_training(training_list, i, k) #Separate training and testing
         hands = generate( train_list ) #Generate rules for each hand
         rules = generalize( hands ) #Generalize the rules into minimum sets
-
+        
         classification = classify(test_list, rules) #Classify the testing set
         right, wrong = evaluate(classification, test_list) #Evaluate correctness of classification of testing set
 
