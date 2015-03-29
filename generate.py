@@ -73,7 +73,7 @@ def maxmin_card( training_dict, hand_size ):
 
 """
 Takes a dictionary describing a hand, and the size of the hand.
-Generates a list of card suits that are the same and those that are differnent.
+Generates a list of card suits that are the same and those that are different.
 Returns this list and the number of same suit.
 Eg. Given: {'S3': '2', 'S2': '4', 'S1': '4', 'S5': '4', 'S4': '1', 'C3': '7', 'C2': '9', 'C1': '8', 'hand': '4', 'C5': '9', 'C4': '10'}
 Will return: [(2, '=', 5)] 
