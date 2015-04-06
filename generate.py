@@ -108,7 +108,7 @@ Will return: [(1, '+', 2), (1, '+', 3), (1, '+', 5) (2, '+', 4), (4, '+', 5)]
 '+' = Adjacent ( +/- 1 from each other)
 'a' = Number adjacent
 """
-def adjacent_card( training_dict, hand_size ):
+def adjacent_card( training_dict, hand_size, max_rank ):
     adj_set = []
     num_adj = 0
 
@@ -122,7 +122,7 @@ def adjacent_card( training_dict, hand_size ):
                 adj_set += [(card, '+', next_card)]
                 num_adj += 1
             #Handles circular potential for 13 card suits, would need to add detection to calculate number to mod by
-            elif((training_dict['C'+str(card)]%12) == (training_dict['C'+str(next_card)]%12)) and (training_dict['C'+str(card)] != training_dict['C'+str(next_card)]):
+            elif((training_dict['C'+str(card)]%(max_rank-1)) == (training_dict['C'+str(next_card)]%(max_rank-1))) and (training_dict['C'+str(card)] != training_dict['C'+str(next_card)]):
                 adj_set += [(card, '+', next_card)]
                 num_adj += 1
 
@@ -136,9 +136,8 @@ Generates rules based on simple assumptions for every hand, and adds them to a d
 Returns this dictionary of hand rules.
 """
 def generate( training_reader ):
-    print "I'm generating : )"
-
     hands = {}
+    max_card = 0
 
     #For each hand in the training set
     for line in training_reader:
@@ -156,11 +155,13 @@ def generate( training_reader ):
             #Count number of cards in hand
             if fnmatch.fnmatch( key, 'C?'):
                 num_cards += 1
+                if line[key] > max_card:
+                    max_card = line[key]
 
         equ = equal_card( line, num_cards ) #Same and different values
         maxmin_num = maxmin_card( line, num_cards ) #Max, min and avg
         same = equal_suit( line, num_cards ) #Same and differnt suits
-        adj = adjacent_card( line, num_cards ) #Adjacent cards
+        adj = adjacent_card( line, num_cards, max_card ) #Adjacent cards
 
         #Add rules to respective hand classifications
         if str(line['hand']) not in hands.keys(): #First time a class has been seen
@@ -175,7 +176,6 @@ For each class, for each hand in that class, compairs rule by rule and eliminate
 Produces a minimum list of rules required to identify a hand classification with 100% coverage.
 """
 def generalize( hands ):
-    print "I'm generalizing! : )"
     generalized_rules = {}
 
     #For each classification option for hands
@@ -221,10 +221,8 @@ Returns a list of dictionaries where each has an 'id' corresponding to the order
 9: Royal flush; {Ace, King, Queen, Jack, Ten} + flush
 """
 def classify( test_list, rules ):
-
-    print "I'm classifying! : )"
-
     count = 0
+    max_card = 0
     classified = []
     # generate a rule for each hand in test list
     for hand in test_list:
@@ -242,11 +240,13 @@ def classify( test_list, rules ):
             #Count number of cards in hand
             if fnmatch.fnmatch( key, 'C?'):
                 num_cards += 1
+                if hand[key] > max_card:
+                    max_card = hand[key]
 
         equ = equal_card( hand, num_cards ) #Same and different values
         maxmin_num = maxmin_card( hand, num_cards ) #Max, min and avg
         same = equal_suit( hand, num_cards ) #Same and differnt suits
-        adj = adjacent_card( hand, num_cards ) #Adjacent cards
+        adj = adjacent_card( hand, num_cards, max_card ) #Adjacent cards
 
         hand_rules = equ + maxmin_num + same + adj + card #Compiled list of rules for the hand
 
@@ -269,7 +269,7 @@ def classify( test_list, rules ):
                     if len(rules[key]) > len(rules[classification]):
                         classification = key
         
-        classified += [{ 'id':count, 'class':classification}] #Add it to the classified list
+        classified += [{ 'id':count, 'hand':classification}] #Add it to the classified list
 
     return classified
 
@@ -315,7 +315,7 @@ def evaluate( classification, test_list):
             s9 += 1
 
         #Check the classification vs. the actual class of each hand
-        if int(test_list[i]['hand']) == int(classification[i]['class']):
+        if int(test_list[i]['hand']) == int(classification[i]['hand']):
             #Increment correct if it was correct
             if int(test_list[i]['hand']) == 0:
                 c0 += 1
@@ -343,7 +343,7 @@ def evaluate( classification, test_list):
             #print (test_list[i])
             #print ('Expect: ' + str(test_list[i]['hand']) + ' Produced: ' + str(classification[i]['class']))
 
-    """
+    
     #Used to print the number of correct and total for each classification
     print ('0: Right: ' + str(c0) + ' out of: ' + str(s0))
     print ('1: Right: ' + str(c1) + ' out of: ' + str(s1))
@@ -355,7 +355,7 @@ def evaluate( classification, test_list):
     print ('7: Right: ' + str(c7) + ' out of: ' + str(s7))
     print ('8: Right: ' + str(c8) + ' out of: ' + str(s8))
     print ('9: Right: ' + str(c9) + ' out of: ' + str(s9))
-    """
+    
 
     return num_right, num_wrong
 
@@ -397,50 +397,75 @@ def run_k_fold_test(training_list):
         classification = classify(test_list, rules) #Classify the testing set
         right, wrong = evaluate(classification, test_list) #Evaluate correctness of classification of testing set
 
-        print ('Right = ', right, ' Wrong = ', wrong)
+        print ("Right = ", right, " Wrong = ", wrong)
 
 """
 Classifies all tuples in the test set using our rules from the training data.
 Input:
 Output: a file of our submission
 """
-def gen_competition_submission(training_list):
-    print "hi"
-
-#WHEN RUNNING: First arg is training file.
-def main():
-
-    training_file = sys.argv[1]
-    test_file = sys.argv[2]
-    
-    training_csv = open( training_file )
-    training_reader = csv.DictReader(training_csv) #Creates a dict from rows in csvfile, using first row as keys
-
-    # creates a dict for the test file as well
-    test_csv = open( test_file )
-    test_reader = csv.DictReader( test_csv )
-
-    #Add all training hands to a list
-    training_list = []
-    for line in training_reader:
-        training_list.append(line)
-
-    # Add all testing hands to a list
-    test_list = []
-    for line in test_reader:
-        test_list.append(line)
-
-
-    # run_k_fold_test(training_list)
-
+def gen_competition_submission(training_list, test_list):
     # GENERATE RULES FOR TEST DATA SET: 
     # use training data to generate saturated rule set
     hands = generate( training_list )
     # generalize saturated rule set
     rules = generalize( hands )
+
     # classify test_set using the general rules
     classification = classify( test_list, rules )
 
+    out_file = open('output.csv', 'w')
+    fieldnames = ['id', 'hand']
+    out_writer = csv.DictWriter(out_file, fieldnames=fieldnames)
+
+    out_writer.writeheader()
+    for line in classification:
+        out_writer.writerow(line)
+
+#WHEN RUNNING: First arg is training file, second is classification file. Will create a csv file called output.csv
+def main():
+
+    if len(sys.argv) < 2:
+        print ("There are two uses for this code:")
+        print ("1: When a single file is input, it will run 10-fold cross validation on that file and print some results.")
+        print ("2: When two files are input, it will run training on the first one and classify the second, outputing the results into a file called output.csv.")
+    elif len(sys.argv) == 2:
+        training_file = sys.argv[1]
+
+        #Creates a dict from rows in csvfile, using first row as keys
+        training_csv = open( training_file )
+        training_reader = csv.DictReader(training_csv) 
+
+        #Add all training hands to a list
+        training_list = []
+        for line in training_reader:
+            training_list.append(line)
+
+        run_k_fold_test(training_list)
+
+    else:
+        training_file = sys.argv[1]
+        test_file = sys.argv[2]
+
+        #Creates a dict from rows in csvfile, using first row as keys
+        training_csv = open( training_file )
+        training_reader = csv.DictReader(training_csv)
+
+        # creates a dict for the test file as well
+        test_csv = open( test_file )
+        test_reader = csv.DictReader( test_csv )
+
+        #Add all training hands to a list
+        training_list = []
+        for line in training_reader:
+            training_list.append(line)
+
+        # Add all testing hands to a list
+        testing_list = []
+        for line in test_reader:
+            testing_list.append(line)
+
+        gen_competition_submission(training_list, testing_list)
 
 
 if __name__ == "__main__":
