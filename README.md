@@ -1,6 +1,8 @@
 ###Overview
 This project is a hand-rolled Python classifier for learning and classifying poker hands for the [Poker Rule Induction Kaggle competition](https://www.kaggle.com/c/poker-rule-induction).
 
+At the height of its glory, our classifier peaked at 99.8% accuracy, and debuted on the Kaggle leaderboard at #37 out of 117 entries. Unfortunately, that remaining 0.2% is forever beyond our reach; without heavy feature engineering, the "sometimes wrap, sometimes not" characteristic of Aces in straights make it impossible to push our algorithm to 100%. You can read more about that in the Challenges section of our report.
+
 ###Our approach
 1. Generate a set of observations about card rank and suits for each hand in the training set.
   * Example: In a training hand, we can observe cards 1 and 2 have a consecutive rank; cards 4 and 5 have the same suit; cards 2, 3, and 4 have the same rank... etc
@@ -9,7 +11,7 @@ This project is a hand-rolled Python classifier for learning and classifying pok
 1. Evaluate the training set against these rules.
   * Example: Which is the most specific rule set that applies to each hand (4 of a kind being more specific than a pair)?
 
-### For more information
+### More information
 For technical details and process, check out the [ report](https://github.com/jerath/pokerhands/blob/master/PokerHandReport.pdf).
 
 For a concise summary, check out the [ slide-deck](https://github.com/jerath/pokerhands/blob/master/PokerHandSlides.pdf).
