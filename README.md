@@ -1,5 +1,5 @@
 ###Overview
-This project is a hand-rolled Python classifier for learning and classifying poker hands for the [Poker Rule Induction Kaggle competition](https://www.kaggle.com/c/poker-rule-induction).
+This project is a hand-rolled Python classifier for learning poker hands for the [Poker Rule Induction Kaggle competition](https://www.kaggle.com/c/poker-rule-induction).
 
 At the height of its glory, our classifier peaked at 99.8% accuracy, and debuted on the Kaggle leaderboard at #37 out of 117 entries. Unfortunately, that remaining 0.2% is forever beyond our reach; without heavy feature engineering, the "sometimes wrap, sometimes not" characteristic of Aces in straights make it impossible to push our algorithm to 100%. You can read more about that in the Challenges section of our report.
 
